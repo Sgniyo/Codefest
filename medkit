@@ -1,0 +1,13 @@
+local tool = script.Parent
+local HEAL_AMOUNT = 50
+
+tool.Activated:Connect(function()
+	local character = tool.Parent
+	local humanoid = character:FindFirstChild("Humanoid")
+	if humanoid then
+		humanoid.Health = math.min(
+			humanoid.Health + HEAL_AMOUNT,
+			humanoid.MaxHealth
+		)
+	end
+end)
