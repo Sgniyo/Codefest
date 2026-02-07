@@ -1,0 +1,92 @@
+local humanoid = script.Parent.Humanoid
+local rootPart = script.Parent.HumanoidRootPart
+local fastcast = require(game.ReplicatedStorage.FastCastRedux)
+local caster = fastcast.new()
+local DETECTION_RANGE = 50
+local AttackRange = 30
+local debounce = false
+local attackTrack = humanoid.Animator:LoadAnimation(script.Parent.Throw)
+local behaviour = fastcast.newBehavior()
+local params = RaycastParams.new()
+params.FilterType = Enum.RaycastFilterType.Exclude
+params.FilterDescendantsInstances = {script.Parent}
+
+behaviour.RaycastParams = params
+behaviour.MaxDistance = 100
+behaviour.AutoIgnoreContainer = true
+behaviour.CosmeticBulletTemplate = game.ServerStorage.Projectile
+behaviour.CosmeticBulletContainer = game.Workspace.Projectiles
+behaviour.Acceleration = Vector3.new(0, 0, 0)
+
+
+caster.CastTerminating:Connect(function(activeCast)
+
+	activeCast.RayInfo.CosmeticBulletObject:Destroy()
+end)
+
+caster.LengthChanged:Connect(function(activeCast,lastPoint,direction,displacement,segmentVelocity,cosmeticBulletObject)
+	local newPos = lastPoint + (direction * displacement)
+	cosmeticBulletObject.Position = newPos 
+end)
+
+caster.RayHit:Connect(function(activeCast,result:RaycastResult,segmentVelocity,cosmeticBulletObject:Part)
+	cosmeticBulletObject:Destroy()
+	local humanoid = result.Instance.Parent:FindFirstChildOfClass("Humanoid")
+	if result.Instance.Parent.ClassName == "Accessory" then
+		humanoid = result.Instance.Parent.Parent:FindFirstChildOfClass("Humanoid")
+	end
+	if humanoid then
+		humanoid:TakeDamage(10)
+	end
+
+end)
+
+function stop()
+	humanoid.WalkToPart = rootPart
+end
+
+local function attack(target)
+	stop()
+	attackTrack:Play()
+	rootPart.CFrame = CFrame.new(rootPart.Position, target.Position)
+	if not debounce then
+		debounce = true
+		task.wait(0.35)
+		caster:Fire(script.Parent.Head.CFrame.Position,script.Parent.Head.CFrame.LookVector ,80,behaviour) 
+	end
+	wait(1)
+	debounce = false
+end
+
+function findNearestTorso(pos)
+	local closestTarget = nil
+	local closestDist = math.huge
+
+	for i, v in pairs(workspace.Characters:GetChildren()) do
+		local humanoid = v:FindFirstChildOfClass("Humanoid")
+		local torso = v:FindFirstChild("HumanoidRootPart")
+
+		if humanoid and torso and humanoid.Health > 0 then
+			local distance = (torso.Position - pos).Magnitude
+
+			if distance <= DETECTION_RANGE and distance < closestDist then
+				closestDist = distance
+				closestTarget = torso
+			end
+		end
+	end
+
+	return closestTarget
+end
+
+while true do
+	wait(0.1)
+	local target:Part = findNearestTorso(rootPart.Position)
+	if target ~= nil and AttackRange <= (target.Position - rootPart.Position).Magnitude then
+		humanoid:MoveTo(target.Position, target)
+	else 
+		if target ~= nil then
+			attack(target)
+		end
+	end
+end
