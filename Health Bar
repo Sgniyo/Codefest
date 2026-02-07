@@ -1,0 +1,27 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local bar = script.Parent
+local fill = bar:WaitForChild("HealthFill")
+local text = bar:WaitForChild("HealthText")
+
+local function updateHealth()
+	local current = math.floor(humanoid.Health)
+	local max = math.floor(humanoid.MaxHealth)
+	local percent = math.clamp(current / max, 0, 1)
+
+	text.Text = current .. " / " .. max
+	fill.Size = UDim2.new(percent, 0, 1, 0)
+
+	if percent > 0.5 then
+		fill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+	elseif percent > 0.25 then
+		fill.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+	else
+		fill.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	end
+end
+
+humanoid.HealthChanged:Connect(updateHealth)
+updateHealth()
