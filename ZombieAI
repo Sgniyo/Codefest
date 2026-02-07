@@ -1,0 +1,63 @@
+local players = game:GetService("Players")
+local pathFindingService = game:GetService("PathfindingService")
+local runService = game:GetService("RunService")
+
+local npc = script.Parent
+local humanoid = npc:WaitForChild("Humanoid")
+local rootPart = npc:WaitForChild("HumanoidRootPart")
+local animation = script.Parent.AttackAnim
+local loadedAnimation = humanoid:LoadAnimation(animation)
+local attacking = false 
+
+humanoid.WalkSpeed = 16
+
+local function DetectPlayer()
+	local nearestPlayer = nil
+	local shortestDistance = math.huge
+	for i,player in pairs(players:GetPlayers()) do 
+		if player.Character then 
+			local distance = (player.Character.HumanoidRootPart.Position - rootPart.Position).Magnitude
+			if distance <= shortestDistance then
+				shortestDistance = distance
+				nearestPlayer = player.Character
+			end
+		end
+	end
+	return nearestPlayer
+end
+
+local function Attack(Target)
+	if attacking then return end
+	attacking = true
+	humanoid:moveTo(rootPart.Position)
+	loadedAnimation:Play()
+	task.wait(0.35)
+	
+	if Target.Humanoid.Health > 0 then
+		Target.Humanoid:TakeDamage(25)
+	end
+	
+	wait(3)
+	attacking = false 
+end
+
+while humanoid.Health > 0 do
+	local target = DetectPlayer()
+
+	if target then
+		local targetRoot = target:FindFirstChild("HumanoidRootPart")
+		if targetRoot then
+			local direction = targetRoot.Position - rootPart.Position
+			local distance = direction.Magnitude
+			
+			if distance <= 7 then 
+				Attack(target)
+			else
+				humanoid:MoveTo(targetRoot.Position)
+			end
+			
+		end
+	end
+
+	task.wait(0.1)
+end
