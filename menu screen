@@ -1,0 +1,5 @@
+local menu = script.Parent.Parent.Parent
+
+script.Parent.MouseButton1Click:Connect(function()
+	menu:Destroy()
+end)
