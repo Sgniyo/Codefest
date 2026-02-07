@@ -1,0 +1,25 @@
+local GunEvent = game.ReplicatedStorage:WaitForChild("GunEvent")
+local Bullet = game.ServerStorage:WaitForChild("Bullet")
+local TS = game:GetService("TweenService")
+
+GunEvent.OnServerEvent:Connect(function(plr, tool, startpos, endpos)
+    local Direction = (endpos - startpos).Unit * 200
+
+    local RayCastParams = RaycastParams.new()
+    RayCastParams.FilterType = Enum.RaycastFilterType.Exclude
+    RayCastParams.FilterDescendantsInstances = {tool:GetDescendants(), plr.Character:GetDescendants()}
+
+    local RayCast = workspace:Raycast(startpos, Direction, RayCastParams)
+
+    if RayCast.Instance.Parent:FindFirstChild("Humanoid") then
+        RayCast.Instance.Parent.Humanoid.Health -= 50
+
+        local Duration = (endpos - startpos).Magnitude / 1000
+        local BulletClone = Bullet:Clone()
+        BulletClone.Parent = game.Workspace
+        BulletClone.Position = startpos
+        BulletClone.CFrame = CFrame.new(startpos, startpos + tool.Middle.CFrame.LookVector)
+        local BulletTween = TS:Create(BulletClone, TweenInfo.new(Duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = endpos})
+        BulletTween:Play()
+    end
+end)
