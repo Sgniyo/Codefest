@@ -1,0 +1,62 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local boss = workspace:WaitForChild("Boss")
+local humanoid = boss:WaitForChild("Humanoid")
+local rootPart = boss:WaitForChild("HumanoidRootPart")
+
+local startTrigger = workspace:WaitForChild("ChaseStartTrigger")
+local endTrigger = workspace:WaitForChild("ChaseEndTrigger")
+
+local chasing = false
+local currentTarget = nil
+
+local function spawnBehindPlayer(player, distance)
+	local char = player.Character
+	if not char then return end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	local behindPos = hrp.Position - (hrp.CFrame.LookVector * distance)
+
+	rootPart.CFrame = CFrame.new(behindPos, hrp.Position)
+end
+
+startTrigger.Touched:Connect(function(hit)
+	local character = hit.Parent
+	local player = Players:GetPlayerFromCharacter(character)
+	if not player or chasing then return end
+
+	chasing = true
+	currentTarget = player
+
+	spawnBehindPlayer(player, 10)
+
+	humanoid.WalkSpeed = 20
+end)
+
+endTrigger.Touched:Connect(function(hit)
+	local character = hit.Parent
+	local player = Players:GetPlayerFromCharacter(character)
+
+	if player and player == currentTarget then
+		chasing = false
+		currentTarget = nil
+		humanoid:MoveTo(rootPart.Position) 
+	end
+end)
+
+RunService.Heartbeat:Connect(function()
+	if not chasing or not currentTarget then return end
+
+	local char = currentTarget.Character
+	if not char then return end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChild("Humanoid")
+
+	if hrp and hum and hum.Health > 0 then
+		humanoid:MoveTo(hrp.Position)
+	end
+end)
