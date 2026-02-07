@@ -1,0 +1,18 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+
+local remote = ReplicatedStorage:WaitForChild("NPCGiveItem")
+local tool = ServerStorage:WaitForChild("Medkit")
+
+remote.OnServerEvent:Connect(function(player)
+	print("Server received request from", player.Name) -- DEBUG
+
+	if player.Backpack:FindFirstChild(tool.Name) then
+		print("Player already has medkit")
+		return
+	end
+
+	local clone = tool:Clone()
+	clone.Parent = player.Backpack
+	print("Medkit given")
+end)
