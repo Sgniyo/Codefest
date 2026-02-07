@@ -1,5 +1,20 @@
-local menu = script.Parent.Parent.Parent
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+
+local menuGui = script.Parent:FindFirstAncestorOfClass("ScreenGui")
+
+
+local backpackGui = playerGui:WaitForChild("Backpack")
+backpackGui.Enabled = false -- safety, optional
 
 script.Parent.MouseButton1Click:Connect(function()
-	menu:Destroy()
+	
+	backpackGui.Enabled = true
+
+	
+	menuGui:Destroy()
 end)
