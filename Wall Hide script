@@ -1,0 +1,29 @@
+local wall = workspace:WaitForChild("ArenaWall")
+local enemiesFolder = workspace:WaitForChild("Zombies")
+
+wall.CanCollide = true
+
+local function areEnemiesAlive()
+	for _, enemy in ipairs(enemiesFolder:GetChildren()) do
+		local humanoid = enemy:FindFirstChildWhichIsA("Humanoid", true)
+		if humanoid and humanoid.Health > 0 then
+			return true
+		end
+	end
+	return false
+end
+
+if not areEnemiesAlive() then
+	wall.CanCollide = false
+end
+
+for _, enemy in ipairs(enemiesFolder:GetChildren()) do
+	local humanoid = enemy:FindFirstChildWhichIsA("Humanoid", true)
+	if humanoid then
+		humanoid.Died:Connect(function()
+			if not areEnemiesAlive() then
+				wall.CanCollide = false
+			end
+		end)
+	end
+end
