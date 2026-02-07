@@ -1,0 +1,19 @@
+local tool = script.Parent
+local HEAL_AMOUNT = 50
+
+tool.Activated:Connect(function()
+	local character = tool.Parent
+	if not character then return end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then return end
+
+	
+	humanoid.Health = math.min(
+		humanoid.Health + HEAL_AMOUNT,
+		humanoid.MaxHealth
+	)
+
+	
+	tool:Destroy()
+end)
