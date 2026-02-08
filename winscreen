@@ -1,0 +1,22 @@
+local winPart = script.Parent
+local players = game:GetService("Players")
+
+-- Function to enable the Win GUI for the player
+local function showWinGUI(player)
+	local playerGui = player:FindFirstChild("PlayerGui")
+	if playerGui then
+		local winGUI = playerGui:FindFirstChild("WinGUI") -- Make sure the GUI name matches
+		if winGUI then
+			winGUI.Enabled = true  -- Enable the GUI
+		end
+	end
+end
+
+-- Detect when the part is touched
+winPart.Touched:Connect(function(hit)
+	local character = hit.Parent
+	local player = players:GetPlayerFromCharacter(character)
+	if player then
+		showWinGUI(player)
+	end
+end)
