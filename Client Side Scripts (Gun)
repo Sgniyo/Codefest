@@ -1,0 +1,11 @@
+--THIS CODE IS FOR THE GUN, ALSO I ACCIDENTLY MADE 2 FILES FOR THE GUN'S SERVER SIDE SCRIPTS, SORRY
+local GunEvent = game.ReplicatedStorage:WaitForChild("GunEvent")
+local player = game.Players.LocalPlayer
+local tool = script.Parent
+
+tool.Activated:Connect(function()
+  local StartPosition = tool.Start.Position
+  local EndPosition = player:GetMouse().Hit.Position
+
+  GunEvent:
+end)
